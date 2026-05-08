@@ -115,7 +115,7 @@ DOWNLOAD_MOD_MENU() {
     local FILENAME="MOD_MENU.rar"
 
     echo "正在下载MOD补丁..."
-    local API_RESPONSE=$(curl -s "https://api.github.com/repos/${OWNER}/${REPO}/releases/latest")
+    local API_RESPONSE=$(curl -s "https://api.github.com/repos/${OWNER}/${REPO}/releases/tags/3.2.0")
     local JMBQ_VERSION=$(echo "${API_RESPONSE}" | jq -r '.tag_name')
     # 修改：查找name中含有.rar的文件，而不是直接使用第一个assets
     local DOWNLOAD_LINK=$(echo "${API_RESPONSE}" | jq -r '.assets[] | select(.name | contains(".rar")) | .browser_download_url' | head -n 1)
@@ -181,7 +181,17 @@ DOWNLOAD_APK() {
         # 普通APK模式下载逻辑
         APK_FILENAME="${GAME_SERVER}.apk"
         echo "正在下载APK..."
-        curl -L -o "${DOWNLOAD_DIR}/${APK_FILENAME}" "${APK_URL}"
+        
+        FILE_ID=$(echo "${APK_URL}" | grep -oP '(?<=/d/)[^/]+')
+        curl -L "https://drive.google.com/uc?export=download&id=${FILE_ID}" -o ${DOWNLOAD_DIR}/gdrive_page.html
+        echo "https://drive.google.com/uc?export=download&id=${FILE_ID}"
+        UUID=$(grep -oP '(?<=name="uuid" value=")[^"]+' ${DOWNLOAD_DIR}/gdrive_page.html)
+        echo $UUID
+        echo "https://drive.google.com/uc?export=download&id=${FILE_ID}&confirm=t&uuid=${UUID}"
+        rm -rf ${DOWNLOAD_DIR}/gdrive_page.html
+        
+        curl -L -o "${DOWNLOAD_DIR}/${APK_FILENAME}" "https://drive.usercontent.google.com/download?id=${FILE_ID}&export=download&confirm=t&uuid=${UUID}"
+
         if [ $? -ne 0 ]; then
             echo "APK下载失败"
             exit 1
