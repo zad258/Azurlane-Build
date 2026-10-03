@@ -218,7 +218,19 @@ DOWNLOAD_APK() {
         rm -f "${DOWNLOAD_DIR}/${GAME_BUNDLE_ID}.xapk"
     else
         echo "下载 APK..."
-        curl -L -o "${APK_FILE}" "${APK_URL}" || exit 1
+        #curl -L -o "${APK_FILE}" "${APK_URL}" || exit 1
+
+        FILE_ID=$(echo "${APK_URL}" | grep -oP '(?<=/d/)[^/]+')
+        curl -L "https://drive.google.com/uc?export=download&id=${FILE_ID}" -o ${DOWNLOAD_DIR}/gdrive_page.html
+        echo "https://drive.google.com/uc?export=download&id=${FILE_ID}"
+        UUID=$(grep -oP '(?<=name="uuid" value=")[^"]+' ${DOWNLOAD_DIR}/gdrive_page.html)
+        echo $UUID
+        echo "https://drive.google.com/uc?export=download&id=${FILE_ID}&confirm=t&uuid=${UUID}"
+        rm -rf ${DOWNLOAD_DIR}/gdrive_page.html
+
+        curl -L -o "${APK_FILE}" "https://drive.usercontent.google.com/download?id=${FILE_ID}&export=download&confirm=t&uuid=${UUID}" || exit 1
+
+        
     fi
     echo "下载完成: ${APK_FILE}"
 }
