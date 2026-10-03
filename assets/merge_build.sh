@@ -228,7 +228,7 @@ DOWNLOAD_APK() {
         echo "https://drive.google.com/uc?export=download&id=${FILE_ID}&confirm=t&uuid=${UUID}"
         rm -rf ${DOWNLOAD_DIR}/gdrive_page.html
 
-        curl -L -o "${DOWNLOAD_DIR}/${APK_FILENAME}" "https://drive.usercontent.google.com/download?id=${FILE_ID}&export=download&confirm=t&uuid=${UUID}" || exit 1
+        curl -L -o "${APK_FILE}" "https://drive.usercontent.google.com/download?id=${FILE_ID}&export=download&confirm=t&uuid=${UUID}" || exit 1
 
         
     fi
